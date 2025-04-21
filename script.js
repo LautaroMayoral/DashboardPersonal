@@ -2,15 +2,41 @@ let salesData = [];
 let barChart, pieChart;
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("data.json")
-    .then((res) => res.json())
-    .then((data) => {
-      salesData = data;
-      populateTable(data);
-      updateCategoryFilter(data);
-      updateTotalSales(data);
-      updateCharts(data);
-    });
+  // Cargar datos desde localStorage
+  const storedData = JSON.parse(localStorage.getItem("salesData")) || [];
+  salesData = storedData;
+
+  populateTable(salesData);
+  updateCategoryFilter(salesData);
+  updateTotalSales(salesData);
+  updateCharts(salesData);
+});
+document.getElementById("dataForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const product = document.getElementById("product").value;
+  const category = document.getElementById("category").value;
+  const region = document.getElementById("region").value;
+  const sales = parseFloat(document.getElementById("sales").value);
+
+  // Crear un nuevo objeto de datos
+  const newData = { product, category, region, sales };
+
+  // Agregar el nuevo dato al array de datos
+  salesData.push(newData);
+
+  // Guardar en localStorage
+  localStorage.setItem("salesData", JSON.stringify(salesData));
+
+  // Actualizar la tabla y los gráficos
+  populateTable(salesData);
+  updateCategoryFilter(salesData);
+  updateTotalSales(salesData);
+  updateCharts(salesData);
+
+  // Limpiar el formulario
+  e.target.reset();
+});
 
   document.getElementById("category").addEventListener("change", (e) => {
     const filtered = filterData(salesData, e.target.value);
